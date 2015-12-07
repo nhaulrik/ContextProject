@@ -27,6 +27,8 @@ import weka.core.converters.ArffSaver;
 
 public class MainActivity extends Activity implements SensorEventListener {
 
+    //hej niko :)
+
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
