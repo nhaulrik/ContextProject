@@ -35,6 +35,7 @@ import weka.core.converters.ArffSaver;
 
 // hej igen
 // bababaasdasd
+//HEj 2
 
 public class MainActivity extends Activity implements SensorEventListener {
 
