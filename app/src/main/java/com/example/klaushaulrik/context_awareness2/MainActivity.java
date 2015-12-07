@@ -34,7 +34,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
-    TextView xVal,yVal,zVal, velocityText;
+    TextView xVal,yVal,zVal, velocityText, samples, accSamples;
     List<AccObj> accObjList = new ArrayList<AccObj>();
     List<ResultObject> resultList = new ArrayList<ResultObject>();
 
@@ -68,6 +68,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 float f = location.getSpeed();
                 double d = f;
                 veloList.add(d);
+                samples.setText(veloList.size() + " samples");
 
                 if (veloList.size() == 128) {
                     statsVelocity = new Statistics((ArrayList<Double>) veloList);
@@ -94,15 +95,18 @@ public class MainActivity extends Activity implements SensorEventListener {
         xVal = (TextView)findViewById(R.id.xVal);
         yVal = (TextView)findViewById(R.id.yVal);
         zVal = (TextView)findViewById(R.id.zVal);
-
+        samples = (TextView)findViewById(R.id.samples);
         velocityText = (TextView)findViewById(R.id.velocityText);
-
+        accSamples = (TextView)findViewById(R.id.accSamples);
         final Button collectBtn = (Button) findViewById(R.id.collectBTN);
         try {
             createARFF = new CreateARFF("walking");
+            speedARFF = new CreateARFF("Driving");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
 
         collectBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -155,6 +159,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             if (accObjList.size() < 129) {
                 accObjList.add(bla);
+                accSamples.setText(accObjList.size() + " samples");
+
             }
 
             if (accObjList.size() == 128) {
