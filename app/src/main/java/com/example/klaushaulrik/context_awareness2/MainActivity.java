@@ -6,7 +6,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,28 +13,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import weka.core.Attribute;
 import weka.core.FastVector;
-import weka.core.Instance;
 import weka.core.Instances;
 
 import weka.core.converters.ArffSaver;
 
-
-
-
-// hej igen
-// bababaasdasd
-//HEj 2
+//Heeeeejejejeje
 
 public class MainActivity extends Activity implements SensorEventListener {
 
@@ -43,7 +31,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
     TextView xVal,yVal,zVal;
-    ArffSaver saver = new ArffSaver();
     List<AccObj> accObjList = new ArrayList<AccObj>();
     List<ResultObject> resultList = new ArrayList<ResultObject>();
 
