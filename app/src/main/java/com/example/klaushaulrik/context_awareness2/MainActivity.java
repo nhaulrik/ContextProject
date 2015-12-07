@@ -1,11 +1,15 @@
 package com.example.klaushaulrik.context_awareness2;
-/// heeeej
+
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,38 +28,65 @@ import weka.core.Instances;
 
 import weka.core.converters.ArffSaver;
 
-//Heeeeejejejeje
-
 public class MainActivity extends Activity implements SensorEventListener {
 
-    //hej niko :)
 
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
-    TextView xVal,yVal,zVal;
+    TextView xVal,yVal,zVal, velocityText;
     List<AccObj> accObjList = new ArrayList<AccObj>();
     List<ResultObject> resultList = new ArrayList<ResultObject>();
+
+    List<Double> veloList = new ArrayList<Double>();
+
 
     Statistics statsX;
     Statistics statsY;
     Statistics statsZ;
-    Statistics statsEuclid;
+    Statistics statsEuclid, statsVelocity;
     Boolean stop = false;
     FastVector      atts;
     Instances       data;
     double[]        vals;
     CreateARFF createARFF;
-
-
-
-
+    CreateARFF speedARFF;
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+                velocityText.setText("Velocity: " + location.getSpeed()+  " m/s");
+
+                //Vi henter hastigheden og gemmer den i en liste som senere skal bruges til statistik
+                float f = location.getSpeed();
+                double d = f;
+                veloList.add(d);
+
+                if (veloList.size() == 128) {
+                    statsVelocity = new Statistics((ArrayList<Double>) veloList);
+                    speedARFF.addValue(statsVelocity.getMean(), statsVelocity.getStdDev(), statsVelocity.getMin(), statsVelocity.getMax());
+                    speedARFF.writeFile();
+
+                    for (int i = 0; i < 64; i++) {
+                        veloList.remove(0);
+                    }
+                }
+
+
+            }
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onProviderEnabled(String provider) {}
+            public void onProviderDisabled(String provider) {}
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -62,24 +94,15 @@ public class MainActivity extends Activity implements SensorEventListener {
         xVal = (TextView)findViewById(R.id.xVal);
         yVal = (TextView)findViewById(R.id.yVal);
         zVal = (TextView)findViewById(R.id.zVal);
+
+        velocityText = (TextView)findViewById(R.id.velocityText);
+
         final Button collectBtn = (Button) findViewById(R.id.collectBTN);
-        final Button logButton = (Button) findViewById(R.id.logButton);
         try {
             createARFF = new CreateARFF("walking");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        //FastVector      atts;
-        //atts = new FastVector();
-
-        logButton.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View v) {
-                Log.v("MyActivity", accObjList.toString() + " SIZE: " + accObjList.size());
-            }
-        });
 
         collectBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -147,6 +170,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             statsEuclid = new Statistics((ArrayList<Double>) euclidNormArray);
 
+
+
             if (accObjList.size() == 128) {
 
 /**
@@ -164,6 +189,8 @@ public class MainActivity extends Activity implements SensorEventListener {
                 createARFF.writeFile();
 
 
+
+
                 for (int i = 0; i < 64; i++) {
                     accObjList.remove(0);
                 }
@@ -177,4 +204,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
+
+
 }
