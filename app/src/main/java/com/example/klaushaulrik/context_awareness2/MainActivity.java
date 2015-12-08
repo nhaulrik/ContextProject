@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
     private SensorManager senSensorManager;
+    private LocationListener locationListener;
     private Sensor senAccelerometer;
     TextView xVal,yVal,zVal, velocityText, samples, accSamples;
     List<AccObj> accObjList = new ArrayList<AccObj>();
@@ -49,17 +50,18 @@ public class MainActivity extends Activity implements SensorEventListener {
     FastVector      atts;
     Instances       data;
     double[]        vals;
-    CreateARFF createARFF;
+    CreateARFF accARFF;
     CreateARFF speedARFF;
     private LocationManager locationManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new LocationListener() {
+         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+         locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 velocityText.setText("Velocity: " + location.getSpeed()+  " m/s");
@@ -70,12 +72,12 @@ public class MainActivity extends Activity implements SensorEventListener {
                 veloList.add(d);
                 samples.setText(veloList.size() + " samples");
 
-                if (veloList.size() == 128) {
+                if (veloList.size() == 32) {
                     statsVelocity = new Statistics((ArrayList<Double>) veloList);
                     speedARFF.addValue(statsVelocity.getMean(), statsVelocity.getStdDev(), statsVelocity.getMin(), statsVelocity.getMax());
                     speedARFF.writeFile();
 
-                    for (int i = 0; i < 64; i++) {
+                    for (int i = 0; i < 16; i++) {
                         veloList.remove(0);
                     }
                 }
@@ -87,7 +89,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             public void onProviderDisabled(String provider) {}
         };
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -98,26 +99,62 @@ public class MainActivity extends Activity implements SensorEventListener {
         samples = (TextView)findViewById(R.id.samples);
         velocityText = (TextView)findViewById(R.id.velocityText);
         accSamples = (TextView)findViewById(R.id.accSamples);
-        final Button collectBtn = (Button) findViewById(R.id.collectBTN);
-        try {
-            createARFF = new CreateARFF("walking");
-            speedARFF = new CreateARFF("Driving");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final Button walkingBtn = (Button) findViewById(R.id.walkingBtn);
+        final Button bikeBtn = (Button) findViewById(R.id.bikeBtn);
+        final Button driveBtn = (Button) findViewById(R.id.driveBtn);
 
 
 
-        collectBtn.setOnClickListener(new View.OnClickListener() {
+
+
+        walkingBtn.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                onStartClick();
+
+                try {
+                    accARFF = new CreateARFF("walking","acc");
+                    speedARFF = new CreateARFF("walking","speed");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                startSensors();
             }
         });
-    }
 
-    public void onStartClick( ) {
+    driveBtn.setOnClickListener(new View.OnClickListener() {
+
+        public void onClick(View v) {
+            try {
+                accARFF = new CreateARFF("driving","acc");
+                speedARFF = new CreateARFF("driving","speed");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            startSensors();
+        }
+    });
+
+bikeBtn.setOnClickListener(new View.OnClickListener() {
+
+public void onClick(View v) {
+    try {
+        accARFF = new CreateARFF("biking","acc");
+        speedARFF = new CreateARFF("biking","speed");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    startSensors();
+        }
+    });
+ }
+
+    public void startSensors( ) {
+        Log.v("MyActivity","start sensors");
+
         senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL );
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
     }
 
 
@@ -158,7 +195,9 @@ public class MainActivity extends Activity implements SensorEventListener {
             List<Double> euclidNormArray = new ArrayList();
 
             if (accObjList.size() < 129) {
-                accObjList.add(bla);
+
+                    accObjList.add(bla);
+
                 accSamples.setText(accObjList.size() + " samples");
 
             }
@@ -190,9 +229,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 //resultList.add(new ResultObject(statsEuclid.getMean(),statsEuclid.getStdDev(),statsEuclid.getMin(),statsEuclid.getMax()));
 
-                createARFF.addValue(statsEuclid.getMean(),statsEuclid.getStdDev(),statsEuclid.getMin(),statsEuclid.getMax());
+                accARFF.addValue(statsEuclid.getMean(),statsEuclid.getStdDev(),statsEuclid.getMin(),statsEuclid.getMax());
 
-                createARFF.writeFile();
+                accARFF.writeFile();
 
 
 

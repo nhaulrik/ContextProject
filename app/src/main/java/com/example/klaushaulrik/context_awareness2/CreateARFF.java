@@ -25,10 +25,10 @@ public class CreateARFF {
     FastVector movementType;
     private File path;
 
-    public CreateARFF(String type) throws IOException {
+    public CreateARFF(String type, String sensor) throws IOException {
         moveType = type;
 
-        file = new File("/mnt/sdcard/data.arff");
+        file = new File("/mnt/sdcard/"+sensor+ "_"+type+".arff");
 
         attributes = new FastVector();
 
@@ -38,7 +38,9 @@ public class CreateARFF {
         attributes.addElement(new Attribute("max"));
         movementType = new FastVector();
         movementType.addElement("walking");
-        movementType.addElement("running");
+        movementType.addElement("biking");
+        movementType.addElement("driving");
+
         attributes.addElement(new Attribute("movementType", movementType));
         data = new Instances("detectMovementType", attributes, 0);
 

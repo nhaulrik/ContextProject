@@ -42,8 +42,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Collect Samples"
-        android:id="@+id/collectBTN"
+        android:text="Walking"
+        android:id="@+id/walkingBtn"
         android:layout_marginTop="74dp"
         android:layout_below="@+id/yVal"
         android:layout_alignParentStart="true" />
@@ -71,5 +71,24 @@
         android:id="@+id/accSamples"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Biking"
+        android:id="@+id/bikeBtn"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Driving"
+        android:id="@+id/driveBtn"
+        android:layout_above="@+id/velocityText"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="69dp" />
 
 </RelativeLayout>
